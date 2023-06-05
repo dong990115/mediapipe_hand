@@ -1,12 +1,12 @@
 import cv2
 import mediapipe as mp
-
+import math
 from ctypes import cast,POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
 # 노트북의 볼륨 조절
-def set_volume(level):
+def set_volume1(level):
     devices = AudioUtilities.GetSpeakers()
     interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
     volume = cast(interface, POINTER(IAudioEndpointVolume))
@@ -16,9 +16,11 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 my_hands = mp_hands.Hands()
 
-
 cap = cv2.VideoCapture(0)
- 
+
+def dist(x1, y1, x2, y2):
+    return math.sqrt(math.pow(x1 - x2,2)) + math.sqrt(math.pow(y1 - y2,2)) 
+
 with mp_hands.Hands(
     max_num_hands=1,
     min_detection_confidence=0.5, 
@@ -30,32 +32,33 @@ with mp_hands.Hands(
 
         if not success:            
             continue
+
         image = cv2.cvtColor(cv2.flip(img, 1), cv2.COLOR_BGR2RGB)  # 좌우반전 / 영상형식 opencv : BGR, mediapipe : RGB
- 
         results = my_hands.process(image)    # image를 전처리 및 모델 추론
- 
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) 
- 
+
+        
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                finger1 = int(hand_landmarks.landmark[4].y * 100 )   # 손가락 좌표의 y값 변화를 감지
-                finger2 = int(hand_landmarks.landmark[8].y * 100 )
-                
-                dist = int(abs(finger1 - finger2))
-                dist = -65 + dist
-                dist = min(0,dist)
+                open = dist(hand_landmarks.landmark[0].x, hand_landmarks.landmark[0].y,hand_landmarks.landmark[14].x,hand_landmarks.landmark[14].y) < dist(hand_landmarks.landmark[0].x, hand_landmarks.landmark[0].y,hand_landmarks.landmark[16].x,hand_landmarks.landmark[16].y)
+            
+                if open == False:
+                    curdist = -dist(hand_landmarks.landmark[4].x, hand_landmarks.landmark[4].y,hand_landmarks.landmark[8].x, hand_landmarks.landmark[8].y) / (dist(hand_landmarks.landmark[2].x, hand_landmarks.landmark[2].y,hand_landmarks.landmark[5].x, hand_landmarks.landmark[5].y) * 2)
+                    curdist = curdist * 50
+                    curdist = -60 - curdist
+                    curdist = min(0,curdist)
                 # 노트북의 볼륨 조절
-                set_volume(dist)
+                    set_volume1(curdist)
 
                 #cv2.putText(
                 #    image, text='volume=%d' % (dist+100), org=(10, 30),
                 #    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
                 #    color=255, thickness=2)
- 
+
                 mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
  
-        cv2.imshow('gesture detection', image)
-        if cv2.waitKey(1) == ord('q'):
-            break
+        # cv2.imshow('volume', image)
+        # if cv2.waitKey(1) == ord('q'):
+        #     break
  
-cap.release()
+#cap.release()
