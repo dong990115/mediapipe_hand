@@ -17,6 +17,9 @@ mpHands = mp.solutions.hands
 my_hands = mpHands.Hands()
 mpDraw = mp.solutions.drawing_utils
 
+# space_pressed = False
+# hand_flipped = False
+
 def dist(x1, y1, x2, y2):
     return math.sqrt(math.pow(x1 - x2,2)) + math.sqrt(math.pow(y1 - y2,2))
 
@@ -124,7 +127,9 @@ while True:
                     img, text="Adjusting Sound",
                     org=(10,30), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1, color=255, thickness=2)
-                ldist = -dist(handlms.landmark[4].x, handlms.landmark[4].y,handlms.landmark[8].x, handlms.landmark[8].y) / (dist(handlms.landmark[2].x, handlms.landmark[2].y,handlms.landmark[5].x, handlms.landmark[5].y) * 2)
+                ldist = -dist(handlms.landmark[4].x, handlms.landmark[4].y,
+                              handlms.landmark[8].x, handlms.landmark[8].y) / (dist(handlms.landmark[2].x, handlms.landmark[2].y
+                                                                                    ,handlms.landmark[5].x, handlms.landmark[5].y) * 2)
                 ldist = ldist * 50
                 ldist = -60 - ldist
                 ldist = min(0,ldist)
@@ -146,7 +151,9 @@ while True:
                     img, text="Adjusting Brightness",
                     org=(10,30), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1, color=255, thickness=2)
-                rdist = int(dist(handlms.landmark[8].x, handlms.landmark[8].y,handlms.landmark[20].x, handlms.landmark[20].y) / (dist(handlms.landmark[2].x, handlms.landmark[2].y,handlms.landmark[5].x, handlms.landmark[5].y) * 2))
+                rdist = int(dist(handlms.landmark[8].x, handlms.landmark[8].y,
+                                 handlms.landmark[20].x, handlms.landmark[20].y) / (dist(handlms.landmark[2].x, handlms.landmark[2].y,
+                                                                                         handlms.landmark[5].x, handlms.landmark[5].y) * 2))
                 rdist = rdist*255
                 
                 set_brightness(int(rdist))
