@@ -10,20 +10,21 @@ from texting import putText #coded by Junho Pyo
 import gesture  #coded by Junho Pyo
 import distance as ds #coded by Junho Pyo
 
-cap = cv2.VideoCapture(0)
-mpHands = mp.solutions.hands
-my_hands = mpHands.Hands()
-mpDraw = mp.solutions.drawing_utils
+cap = cv2.VideoCapture(0)  # 웹캠으로부터 비디오 캡쳐
+mpHands = mp.solutions.hands  # mediapipe의 hands 모듈 사용위한 mpHands 객체생성
+my_hands = mpHands.Hands()  
+mpDraw = mp.solutions.drawing_utils  
+# drawing_utils 모듈을 이용하여 비디오 프레임에 손 인식 결과 그리기
 #referenced by MediaPipe (Google)
 
-pyautogui.FAILSAFE = False 
-screen_width, screen_height = pyautogui.size() 
-space_pressed = False
-right_pressed = False
-left_pressed = False
-#coded by Junho Pyo
+pyautogui.FAILSAFE = False  # 마우스 커서 모니터 왼쪽 상단에 이동시 예외 발생기능 비활성화
+screen_width, screen_height = pyautogui.size()  # 모니터 너비, 높이 변수 저장
+space_pressed = False  # space_bar 초기화
+right_pressed = False  # 오른쪽 방향키 초기화
+left_pressed = False  # 왼쪽 방향키 초기화
+#coded by Junho Pyo , Donghyeon Lim
 
-def dist(x1, y1, x2, y2):
+def dist(x1, y1, x2, y2):  # 손가락 간에 거리 계산식
     return math.sqrt(math.pow(x1 - x2,2)) + math.sqrt(math.pow(y1 - y2,2))
 
 while True:
@@ -31,7 +32,6 @@ while True:
     h,w,c = img.shape
     if not success:
         continue
-#coded by Donghyeon Lim
 
     img = cv2.cvtColor(cv2.flip(img,1), cv2.COLOR_BGR2RGB)
     results = my_hands.process(img)
@@ -143,11 +143,10 @@ while True:
                     
                 if elapsed_time >= 1:
                         left_pressed = False        
-                #coded by Donghyeon Lim
+                
 
             mpDraw.draw_landmarks(img,handlms,mpHands.HAND_CONNECTIONS)
         
     cv2.imshow("Operating Monitor", img)
-    cv2.waitKey(1)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
